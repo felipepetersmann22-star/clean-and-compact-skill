@@ -1,44 +1,35 @@
 ---
 name: clean-and-compact
-description: Use when one assistant's chat, memory or files have built up, or when the user says clean up, refresh, compact, or start fresh. Waits for in-flight work, compacts what matters into a handover note, refreshes memory, archives old files instead of deleting them, and suggests usage cuts without changing anything on its own.
+description: Review or clean an assistant's accumulated context, files and memory while preserving useful work. Use for a requested cleanup, handover, archive review, or compacting an idle project.
 license: MIT
 ---
 
 # Clean and compact
 
-Goal: leave one assistant lean and fresh while keeping everything important. Never delete anything without the owner's explicit yes. Archive instead.
+Preserve the work needed to continue. Match actions to the request: a review inventories and proposes; a requested cleanup may make safe changes within its authorized scope. Do not infer permission to delete, alter shared resources, send messages, change schedules, or rewrite durable memory. Confirm ownership and platform capabilities before changes; leave ambiguous items untouched.
 
-For a sweep across many assistants on a schedule, use `weekly-cleanup-review`, which runs this skill once per assistant.
+## Check affected work
 
-## 0. Check timing
-- If a project or task is mid-flight (open worker or subagent, waiting on a reply or approval, a build or deploy running), stop here. Tell the owner it will be cleaned once that work wraps, and do nothing else.
-- Be frugal. Read recent chat and existing memory first. Don't re-read whole transcripts.
+Identify the assistant, project and resources in scope. Check for running work, pending approvals and shared ownership. Do not interrupt an active task or alter resources it may use. Continue independent read-only review where possible and report skipped items. Use recent handovers and notes first, then inspect earlier sources when needed to resolve uncertainty.
 
-## 1. Compact the context into a handover
-Write a short handover note, under one page, using the `lean-chats` template. It covers:
-- What this assistant is for, and the owner's standing rules and preferences for it.
-- Decisions made, each with a one-line reason.
-- Open items and next steps, with owner and date.
-- Key files, links, repositories and pages, as paths or URLs.
-- Anything a fresh chat would otherwise have to ask again.
+## Make a useful handover
 
-Save it as a dated file in the assistant's archive folder, for example `archive/<assistant>/handover-YYYY-MM-DD.md`.
+Summarize the goal, current state, decisions and reasons, verified outcomes, unfinished work, blockers, owners and next actions, and direct links to relevant resources. Label unknown or unverified claims. If the `lean-chats` skill and template are available, use them; otherwise this list is a sufficient standalone structure. Keep it short enough to resume from without suppressing important constraints.
 
-## 2. Refresh memory
-- Move lasting facts from the handover into memory: standing rules as profile facts, decisions as dated entries. Use shared memory only for facts every assistant needs.
-- Remove memory facts that are outdated or contradicted, and write the corrected version.
-- Never put addresses, emails, phone numbers, passwords, keys or card details in memory. Use the platform's secure vault if it has one.
+Save or update a handover only in an appropriate user-authorized location. If none is available, present it in the response and identify the gap. Do not claim a handover or memory update was saved when it was not.
 
-## 3. Clean files
-- List this assistant's working files: scratch folders, old drafts, duplicate exports, stale screenshots.
-- Move superseded or duplicate files into `archive/<assistant>/YYYY-MM-DD/`. Don't delete them. Keep the latest version of each deliverable where it is.
-- Compress big archive folders (for example `tar -czf`).
-- Never touch files that belong to another assistant, a shared site or a shared repository.
-- List anything that truly looks deletable and ask the owner before deleting it.
+## Review files and memory
 
-## 4. Cut ongoing usage
-- Review this assistant's scheduled jobs with `frugal-routines`: less often, weekdays and waking hours, event triggers instead of polling, merge duplicates. Suggest only. Change nothing without the owner's yes.
-- Flag repeated research or steps that should become a skill (`reuse-before-research`).
+Inventory candidates with their purpose and current ownership. Preserve current deliverables, active files, shared repositories and links. If the user has authorized archiving, verify source and destination, check for name collisions and concurrent changes, and move only clearly superseded files in scope; record source and destination and verify the result. Handle symlinks and shared folders conservatively. Do not compress or move files merely because a skill suggests it. Ask before permanent deletion, or when a potentially consequential move is ambiguous.
 
-## 5. Report
-Two or three sentences to the owner: where the handover is saved, what was archived, any deletions waiting for a yes, and up to three usage suggestions. If the chat is long and the work has wrapped, say it is safe to start this assistant fresh, because the handover and memory carry everything over.
+Propose durable-memory corrections only for facts supported by current evidence. Update memory only when the user's instructions and platform permit it. Do not store credentials or sensitive personal details in a handover or general memory. Avoid treating stale notes as proof of present state.
+
+## Suggest improvements and report
+
+If requested, identify duplicate routines or repeated work and suggest changes with the trade-off. Use the `frugal-routines` and `reuse-before-research` skills if available; otherwise give a standalone suggestion. Preserve the owner's actual hours, timezone, urgency and existing integrations. Do not change schedules without authorization.
+
+Report what was actually reviewed or changed, where any handover and archived files are, what was proposed or skipped, and what remains unverified. A proposed future cleanup is not a scheduled action.
+
+## Example
+
+An owner asks for a cleanup review while a build is running. Leave its workspace and active files alone, review unrelated idle material, and return a candidate list and handover. Do not claim files were moved or a future cleanup was scheduled.
